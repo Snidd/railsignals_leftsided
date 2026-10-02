@@ -1,0 +1,13 @@
+{
+    "name": "LEFTSIDED_MOD_NAME",
+    "summary": "LEFTSIDED_MOD_SUMMARY",
+    "description": "LEFTSIDED_MOD_DESCRIPTION",
+    "authors": [
+        {
+            "name": "Snidd",
+            "role": "CREATOR"
+        }
+    ],
+    "tags": ["Script Mod"],
+    "url": ""
+}
