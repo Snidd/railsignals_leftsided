@@ -1,7 +1,14 @@
 {
-    "name": "LEFTSIDED_MOD_NAME",
-    "summary": "LEFTSIDED_MOD_SUMMARY",
-    "description": "LEFTSIDED_MOD_DESCRIPTION",
+    "name": "Left-Sided Rail Signals",
+    "summary": "Places railway signals on the left side of the track, for left-hand running.",
+    "description": "Mirrors all railway signals, including those from other mods, to the left side of the track. Purely cosmetic: signal behaviour is unchanged, and the mod can be removed from a save at any time.",
+    "localization": {
+        "sv": {
+            "name": "Vänstersidiga signaler",
+            "summary": "Placerar järnvägssignaler på vänster sida av spåret, för vänstertrafik.",
+            "description": "Speglar alla järnvägssignaler, även de från andra moddar, till vänster sida av spåret. Endast kosmetisk: signalernas funktion är oförändrad, och modden kan tas bort från ett sparat spel när som helst."
+        }
+    },
     "authors": [
         {
             "name": "Snidd",

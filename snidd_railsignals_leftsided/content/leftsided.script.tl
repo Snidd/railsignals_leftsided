@@ -1,5 +1,6 @@
 -- Calls a signal's original updateFn and mirrors its models to the left side of the track.
 -- X runs along the track, Y is lateral (vanilla signals sit at -Y, the right side), Z is up.
+local util = ug_require "::/scripts/util.tl" as Util
 
 local record Closure
 	-- Absolute reference to the wrapped script, "path.script@fn.path"
@@ -8,58 +9,7 @@ local record Closure
 	originalParams : table
 end
 
-local type OriginalUpdateFn = function(captureParams : any, params : any, closure : any) : table
-
-local G = _G as {string : any}
-local cache : {string : OriginalUpdateFn} = {}
-
--- Walks a dotted lua path ("updateFn" or "a.b") inside a loaded script module.
-local function lookup(module : table, luaPath : string) : any
-	local value : any = module
-	for key in luaPath:gmatch("[^%.]+") do
-		if type(value) ~= "table" then
-			return nil
-		end
-		value = (value as table)[key]
-	end
-	return value
-end
-
--- Loads a script by extension-less path. Supports both module scripts (return a table)
--- and legacy scripts (define a global `function data()` returning a table).
-local function loadModule(path : string) : table
-	for _, ext in ipairs({ ".lua", ".tl" }) do
-		local savedData = G.data
-		G.data = false
-		local ok, ret = pcall(ug_require, path .. ext)
-		local legacyData = G.data
-		G.data = savedData
-		if ok then
-			if type(ret) == "table" then
-				return ret as table
-			elseif type(legacyData) == "function" then
-				return (legacyData as function() : table)()
-			end
-		end
-	end
-	error("[leftsided] could not load script " .. path)
-end
-
-local function resolveOriginal(ref : string) : OriginalUpdateFn
-	local fn = cache[ref]
-	if fn == nil then
-		local path, luaPath = ref:match("^(.-)@(.+)$")
-		if path == nil then
-			error("[leftsided] malformed script reference " .. ref)
-		end
-		fn = lookup(loadModule(path), luaPath) as OriginalUpdateFn
-		if fn == nil then
-			error("[leftsided] " .. luaPath .. " not found in " .. path)
-		end
-		cache[ref] = fn
-	end
-	return fn
-end
+local type OriginalUpdateFn = function(closureParams : table, params : table) : table
 
 -- Mirrors a column-major 4x4 transform across the track centreline: M * T with M = diag(1, -1, 1, 1).
 local function mirrorY(transf : {number}) : {number}
@@ -75,8 +25,13 @@ end
 
 local leftsided = {}
 
-function leftsided.updateFn(captureParams : any, params : any, closure : Closure) : table
-	local result = resolveOriginal(closure.original)(captureParams, params, closure.originalParams)
+-- Called by the engine as fn(closureParams, constructionParams), see ::/scripts/construction/construction.script.tl.
+function leftsided.updateFn(closure : Closure, params : table) : table
+	local original = util.useFn(closure.original) as OriginalUpdateFn
+	if original == nil then
+		error("[leftsided] could not load " .. closure.original)
+	end
+	local result = original(closure.originalParams, params)
 	if result == nil or result.signal == nil then
 		return result
 	end

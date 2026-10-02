@@ -96,6 +96,9 @@ Install: `~/Library/Application Support/Steam/steamapps/common/Transport Fever 3
 - The construction `metadata` record is typed (only `emissionConfig`), so a TF2-style `metadata.signal.dontmove` can't be used for opting out.
 - `mod.json` severity values seen: `"None"`, `"Warning"`. The DLC uses `cosmetic: true`, `severityAdd: "None"`, `severityRemove: "Warning"`, and `autoActivate`.
 - Teal definitions ship with the game. Scripts load other scripts with `ug_require "<path>" as <Type>`.
+- **Construction scripts are called as `fn(closureParams, constructionParams)`.** `ScriptRef.params` come *first*, and there are only two arguments (`::/scripts/construction/construction.script.tl`). Scripts are loaded by reference with `util.useFn(ref)` from `::/scripts/util.tl`.
+- Mod-browser name, summary and description go in `_metadata/modinfo.json` (English at the top level, other languages under `localization.<lang>`). `strings.json` is only for in-game strings.
+- **Game log:** `~/Library/Application Support/Steam/userdata/<id>/3493540/local/crash_dump/stdout.txt`. Our `debugPrint` lines are tagged `[leftsided]`.
 - Out of scope: the tunnel portal decoration models `tunnel/rail_blocking/tunnel_*_add_signal_lft.mdl` (part of the tunnel models, not placeable signals).
 
 ## Next steps once the download completes
